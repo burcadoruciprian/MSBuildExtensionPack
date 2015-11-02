@@ -176,11 +176,6 @@ namespace MSBuild.ExtensionPack.Framework
                 return;
             }
 
-            if (!this.MultiLog)
-            {
-                this.multiLogResponseVerbosity = LoggerVerbosity.Normal;
-            }
-
             if (this.MultiProc)
             {
                 this.multiprocparameter = " /m";
