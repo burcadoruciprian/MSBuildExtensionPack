@@ -73,6 +73,7 @@ namespace MSBuild.ExtensionPack.Framework
         private LoggerVerbosity multiLogResponseVerbosity = LoggerVerbosity.Minimal;
         private bool nodereuse;
         private string multiprocparameter = string.Empty;
+        private string nologoparameter = string.Empty;
 
         /// <summary>
         /// Specifies whether or not to use the /m multiproc parameter. If you include this switch without specifying a value for MaxCpuCount, MSBuild will use up to the number of processors in the computer. Default is false.
@@ -162,6 +163,11 @@ namespace MSBuild.ExtensionPack.Framework
         /// Specifies additional properties to pass through to the new parallel instances of MSBuild.
         /// </summary>
         public string AdditionalProperties { get; set; }
+
+        /// <summary>
+        /// Don't display the startup banner or the copyright message.
+        /// </summary>
+        public bool NoLogo { get; set; }
         
         protected override void InternalExecute()
         {
@@ -183,6 +189,11 @@ namespace MSBuild.ExtensionPack.Framework
                 {
                     this.multiprocparameter = " /m:" + this.MaxCpuCount;
                 }
+            }
+
+            if ( this.NoLogo)
+            {
+                this.nologoparameter = " /nologo";
             }
 
             switch (this.TaskAction)
@@ -224,7 +235,7 @@ namespace MSBuild.ExtensionPack.Framework
                     System.Threading.Tasks.Task.WaitAny(tasks);
                 }
             }
-            catch (AggregateException ae)
+            catch (AggregateException ae)                                                                   
             {
                 foreach (var ex in ae.InnerExceptions)
                 {
@@ -275,7 +286,7 @@ namespace MSBuild.ExtensionPack.Framework
                 logginginfo = string.Format(CultureInfo.CurrentCulture, "/l:FileLogger,Microsoft.Build.Engine;{0}verbosity={1};logfile=\"{2}\"", append, this.MultiLogVerbosity, logfileName);
             }
             
-            var exec = new ShellWrapper("msbuild.exe", "\"" + projectFile + "\" /v:" + this.MultiLogResponseVerbosity + " /t:" + item.ItemSpec + properties + this.multiprocparameter + " /nr:" + this.nodereuse + " " + logginginfo);
+            var exec = new ShellWrapper("msbuild.exe", "\"" + projectFile + "\" /v:" + this.MultiLogResponseVerbosity + " /t:" + item.ItemSpec + properties + this.multiprocparameter + " /nr:" + this.nodereuse + " " + this.nologoparameter + " " + logginginfo);
             if (string.IsNullOrEmpty(this.WorkingDirectory) == false)
             {
                 exec.WorkingDirectory = this.WorkingDirectory;
