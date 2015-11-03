@@ -166,6 +166,11 @@ namespace MSBuild.ExtensionPack.Subversion
         /// </summary>
         public string CommitMessage { get; set; }
 
+        /// <summary>
+        /// Enable last committed revision  rather than current revisions ( "-c" switch ). This parameter is used by Version action. 
+        /// </summary>
+        public bool LastCommittedRevision { get; set; }
+
         protected override void InternalExecute()
         {
             if (!this.TargetingLocalMachine())
@@ -486,6 +491,10 @@ namespace MSBuild.ExtensionPack.Subversion
             // execute the tool
             var cmd = this.CreateCommandLineBuilder();
             cmd.AppendSwitch("-q");
+            if ( LastCommittedRevision )
+            {
+              cmd.AppendSwitch( "-c" );
+            }
             cmd.AppendFileNameIfNotNull(this.Item);
             var output = Utilities.ExecuteWithLogging(Log, Path.Combine(SvnPath, SvnVersionExecutableName), cmd.ToString(), false);
 
