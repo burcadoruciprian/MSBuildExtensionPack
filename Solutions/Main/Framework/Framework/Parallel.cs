@@ -430,7 +430,11 @@ namespace MSBuild.ExtensionPack.Framework
                 logginginfo = string.Format(CultureInfo.CurrentCulture, "/l:FileLogger,Microsoft.Build.Engine;{0}verbosity={1};logfile=\"{2}\"", append, this.MultiLogVerbosity, logfileName);
             }
 
-            var exec = new ShellWrapper("msbuild.exe", "\"" + projectFile + "\" /v:" + this.MultiLogResponseVerbosity + " /t:" + resolvedtargets + properties + this.multiprocparameter + " /nr:" + this.nodereuse + " " + logginginfo);
+            var exec = new ShellWrapper("msbuild.exe", "\"" + projectFile + "\""+
+                    " /v:" + (this.MultiLog ? this.MultiLogResponseVerbosity : this.LogVerbosity)  +
+                    " /t:" + resolvedtargets + properties + this.multiprocparameter +
+                    " /nr:" + this.nodereuse +
+                    (this.NoLogo ? " /nologo" : string.Empty) + " " + logginginfo);
             if (string.IsNullOrEmpty(this.WorkingDirectory) == false)
             {
                 exec.WorkingDirectory = this.WorkingDirectory;
